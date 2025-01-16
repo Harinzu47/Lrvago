@@ -37,55 +37,8 @@ class CheckoutPage extends Component
         if(count($cart_items) == 0){
             return redirect()->route('products');
         }
-        $this->selected_province = 3;
-        $this->provinces = $this->fetchProvinces();
        
     }
-
-    public function updatedSelectedProvince($provinceId)
-    {
-        if ($provinceId) {
-            $this->cities = $this->fetchCities($provinceId);
-        } else {
-            $this->cities = [];
-        }
-    }
-
-    private function fetchProvinces()
-    {
-        $response = Http::withHeaders([
-            'key' => env('RAJAONGKIR_API_KEY')
-        ])->get('https://api.rajaongkir.com/starter/province');
-
-        return $response->json()['rajaongkir']['results'] ?? [];
-    }
-
-    private function fetchCities($provinceId)
-    {
-        $response = Http::withHeaders([
-            'key' => env('RAJAONGKIR_API_KEY')
-        ])->get('https://api.rajaongkir.com/starter/city', [
-            'province' => $provinceId
-        ]);
-
-        return $response->json()['rajaongkir']['results'] ?? [];
-    }
-
-    // public function calculateShipping()
-    // {
-    //     // Ganti dengan ID kota asal yang sesuai
-    //     $origin = 501; // ID kota asal (misalnya Jakarta)
-    //     $destination = $this->selected_city; // ID kota tujuan dari dropdown
-    //     $weight = 1000; // Berat dalam gram
-    //     $courier = 'jne'; // Kode kurir yang dipilih
-
-    //     $cost = $this->rajaOngkirService->getCost($origin, $destination, $weight, $courier);
-
-    //     // Ambil ongkos kirim dari respons
-    //     if (isset($cost['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value'])) {
-    //         $this->shipping_cost = $cost['rajaongkir']['results'][0]['costs'][0]['cost'][0]['value'];
-    //     }
-    // }
 
     public function placeOrder()
     {
