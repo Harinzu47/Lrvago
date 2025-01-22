@@ -4,7 +4,8 @@
         <div class="flex flex-col md:flex-row gap-6">
             <div class="md:w-3/4">
                 <div class="bg-white overflow-x-auto rounded-lg shadow-md p-6 mb-4">
-                    <table class="w-full">
+                    <!-- Tabel untuk layar medium ke atas -->
+                    <table class="w-full hidden md:table">
                         <thead>
                             <tr class="border-b">
                                 <th class="text-left font-semibold py-2">Product</th>
@@ -33,8 +34,7 @@
                                     </td>
                                     <td class="py-4">Rp.{{ number_format($item['total_amount'], 2) }}</td>
                                     <td>
-                                        <button wire:click='removeItem({{ $item['product_id'] }})' class="bg-red-500 
-                                        text-white rounded-lg px-3 py-1 hover:bg-red-600">Remove</button>
+                                        <button wire:click='removeItem({{ $item['product_id'] }})' class="bg-red-500 text-white rounded-lg px-3 py-1 hover:bg-red-600">Remove</button>
                                     </td>
                                 </tr>
                             @empty
@@ -44,6 +44,40 @@
                             @endforelse
                         </tbody>
                     </table>
+
+                    <!-- Tampilan card untuk layar kecil -->
+                    <!-- Tampilan card untuk layar kecil -->
+                    <div class="block md:hidden">
+                        @forelse ($cart_items as $item)
+                            <div wire:key='{{ $item['product_id'] }}' class="border rounded-lg p-4 mb-4 shadow-md">
+                                <div class="flex items-center mb-4">
+                                    <img class="h-16 w-16 mr-4 rounded-md" src="{{ url('storage/' . $item['image']) }}" alt="{{ $item['name'] }}">
+                                    <div>
+                                        <h2 class="font-semibold">{{ $item['name'] }}</h2>
+                                        <p class="text-gray-500">Rp.{{ number_format($item['unit_amount'], 2) }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <div class="flex items-center">
+                                        <button wire:click='decreaseQty({{ $item['product_id'] }})' 
+                                                class="border rounded-md py-1 px-2 hover:bg-gray-200">-</button>
+                                        <span class="text-center w-8">{{ $item['quantity'] }}</span>
+                                        <button wire:click='increaseQty({{ $item['product_id'] }})' 
+                                                class="border rounded-md py-1 px-2 hover:bg-gray-200">+</button>
+                                    </div>
+                                    <div>
+                                        <p>Total: <span class="font-semibold">Rp.{{ number_format($item['total_amount'], 2) }}</span></p>
+                                    </div>
+                                    <button wire:click='removeItem({{ $item['product_id'] }})' 
+                                            class="bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-center">No items in cart.</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
             <div class="md:w-1/4">
@@ -53,24 +87,14 @@
                         <span>Subtotal</span>
                         <span>Rp. {{ number_format($total_price, 2, ',', '.') }}</span>
                     </div>
-                    <div class="flex justify-between mb-2">
-                        <span>Taxes</span>
-                        <span>Rp. {{ number_format(0, 2, ',', '.') }}</span>
-                    </div>
-                    <div class="flex justify-between mb-2">
-                        <span>Shipping</span>
-                        <span>Rp. {{ number_format(0, 2, ',', '.') }}</span>
-                    </div>
                     <hr class="my-2">
                     <div class="flex justify-between mb-2 font-semibold">
                         <span>Total</span>
                         <span>Rp. {{ number_format($total_price, 2, ',', '.') }}</span>
                     </div>
                     @if ($cart_items)
-                        <a href="/checkout" class="bg-blue-500 block text-center text-white py-2 px-4 rounded-lg mt-4 w-full 
-                        hover:bg-blue-600">Checkout</a>    
+                        <a href="/checkout" class="bg-blue-500 block text-center text-white py-2 px-4 rounded-lg mt-4 w-full hover:bg-blue-600">Checkout</a>
                     @endif
-                    
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 <div>
-    <section class="relative bg-cover bg-center h-screen" style="background-image: url('{{ asset('images/hero.png') }}');">
+    <section class="relative bg-cover bg-center h-screen" style="background-image: url('{{ asset('images/hero.webp') }}');">
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
         <div class="container mx-auto flex flex-col justify-center items-center h-full text-center relative z-10">
             <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white shadow-orange-500 shadow-lg">Solusi Lingkungan dengan Maggot BSF</h1>
@@ -32,7 +32,6 @@
                             lokal dalam pengelolaan sampah secara mandiri.
                         </li>
                     </ul>
-                    <a wire:navigate href="#" class="mt-6 bg-orange-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-orange-600">Pelajari Lebih Lanjut</a>
                 </div>
                 <div class="flex flex-col justify-center items-center md:items-start">
                     <img src="{{ asset('images/edukasi-maggot.webp') }}" alt="Ilustrasi edukasi tentang Maggot Black Soldier
@@ -68,7 +67,6 @@
                             ternak dan budidaya ikan, mendukung solusi ekonomi yang berkelanjutan.
                         </li>
                     </ul>
-                    <a wire:navigate href="#" class="mt-6 bg-white text-orange-500 px-6 py-3 rounded-full text-lg font-semibold hover:bg-gray-100">Pelajari Manfaat Selengkapnya</a>
                 </div>
             </div>
         </div>
@@ -177,7 +175,7 @@
     </section>    
       <!-- Category Section End -->
       <!-- Customer Section Start -->
-      <section class="py-14 font-poppins dark:bg-gray-800">
+      <section id="review" class="py-14 font-poppins dark:bg-gray-800">
         <div class="max-w-6xl px-4 py-6 mx-auto lg:py-4 md:px-6">
           <div class="max-w-xl mx-auto">
             <div class="text-center ">
@@ -247,5 +245,33 @@
         </div>
       </section>
       <!-- Customer Section End -->
-
+      <!-- About us Section Start -->
+      <section id="about" class="py-12 bg-orange-500">
+        <div class="container mx-auto flex flex-col md:flex-row items-center">
+            <!-- Gambar Usaha -->
+            <div class="md:w-1/2">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo Larva Go" class="mx-auto mb-4 w-48 h-auto md:w-64 lg:w-80">
+            </div>
+            
+            <!-- Teks Penjelasan -->
+            <div class="md:w-1/2 text-center md:text-left md:pl-8">
+                <h2 class="text-3xl font-bold mb-6 text-white">Larva Go: Solusi Ramah Lingkungan untuk Pengelolaan Limbah</h2>
+                <p class="mb-4 text-white">
+                    Larva Go adalah usaha yang berfokus pada pengelolaan limbah organik melalui pemanfaatan Maggot Black Soldier Fly (BSF). 
+                    Dengan alamat di Desa Kebandingan RT 04 RW 01, Kecamatan kedungbanteng, Kabupaten Tegal, Indonesia, kami berkomitmen untuk memberikan solusi yang efektif dan berkelanjutan 
+                    dalam mengurangi limbah serta meningkatkan produktivitas di sektor pertanian dan peternakan.
+                </p>
+                <p class="mb-4 text-white">
+                    Kami menyediakan produk maggot berkualitas tinggi yang kaya akan protein dan nutrisi, cocok untuk pakan ikan, burung, dan hewan peliharaan lainnya. 
+                    Dengan pendekatan yang ramah lingkungan, Larva Go tidak hanya membantu mengelola limbah organik, tetapi juga memberdayakan komunitas lokal 
+                    untuk berpartisipasi dalam pengelolaan sampah secara mandiri.
+                </p>
+                <p class="mb-4 text-white">
+                    Bergabunglah dengan kami dalam menciptakan lingkungan yang lebih bersih dan berkelanjutan. Temukan lebih banyak informasi tentang produk 
+                    dan layanan kami di website kami.
+                </p>
+            </div>
+        </div>
+    </section>
+      <!-- About us Section End -->
 </div>

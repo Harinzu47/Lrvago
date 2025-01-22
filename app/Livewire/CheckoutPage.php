@@ -23,7 +23,7 @@ class CheckoutPage extends Component
     public $kecamatan;
     public $kode_pos;
     public $payment_method;
-    public $shipping_cost = 0; // Variabel untuk menyimpan ongkos kirim
+    public $shipping_cost = 10000; // Variabel untuk menyimpan ongkos kirim
     public $provinces = [];
     public $cities = [];
     public $selected_province;
@@ -61,7 +61,7 @@ class CheckoutPage extends Component
         // Buat entri Order baru
         $order = new Order();
         $order->user_id = auth()->user()->id;
-        $order->total_price = CartManagement::calculateTotalPrice($cart_items); // Total harga barang
+        $order->total_price = CartManagement::calculateTotalPrice($cart_items) + $this->shipping_cost; // Total harga barang
         $order->payment_method = $this->payment_method;
         $order->payment_status = 'pending'; // Default status pembayaran
         $order->status = 'new'; // Status order baru
@@ -148,7 +148,7 @@ class CheckoutPage extends Component
     public function render()
     {
         $cart_items = CartManagement::getCartItemsFromCookie();
-        $total_price = CartManagement::calculateTotalPrice($cart_items); // Tambahkan ongkos kirim ke total harga
+        $total_price = CartManagement::calculateTotalPrice($cart_items)+ $this->shipping_cost; // Tambahkan ongkos kirim ke total harga
 
         return view('livewire.checkout-page', [
             'cart_items' => $cart_items,

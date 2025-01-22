@@ -49,6 +49,18 @@ class UserResource extends Resource
                     ->password()
                     ->dehydrated(fn ($state) => filled($state))
                     ->required(fn (Page $livewire): bool => $livewire instanceof CreateRecord),
+
+                Forms\Components\Select::make('role')
+                    ->label('Role')
+                    ->options([
+                        'owner' => 'Owner',
+                        'admin_pemasaran' => 'Admin Pemasaran',
+                        'admin_penjualan' => 'Admin Penjualan',
+                        'staff' => 'Staff',
+                        'pelanggan' => 'Pelanggan',
+                    ])
+                    ->required()
+                    ->default('pelanggan'),
             ]);
     }
 
@@ -59,6 +71,10 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('role')
+                    ->label('Role') // Tambahkan kolom role
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()

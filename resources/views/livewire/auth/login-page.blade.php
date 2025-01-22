@@ -11,6 +11,12 @@
                   Sign up here
                 </a>
               </p>
+              <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Are you an admin?
+                <a wire:navigate class="text-blue-600 decoration-2 hover:underline font-medium dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="/admin">
+                    Go to Admin Panel
+                </a>
+            </p>
             </div>
   
             <hr class="my-5 border-slate-300">

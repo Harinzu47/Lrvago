@@ -140,21 +140,13 @@
                         ORDER SUMMARY
                     </div>
                     <div class="flex justify-between mb-2 font-bold">
-                        <span>Subtotal</span>
-                        <span>{{ Number::currency($total_price, 'Rp.') }}</span>
-                    </div>
-                    <div class="flex justify-between mb-2 font-bold">
-                        <span>Taxes</span>
-                        <span>{{ Number::currency(0, 'Rp.') }}</span>
-                    </div>
-                    <div class="flex justify-between mb-2 font-bold">
                         <span>Shipping Cost</span>
                         <span>{{ Number::currency($shipping_cost, 'Rp.') }}</span>
                     </div>
                     <hr class="bg-slate-400 my-4 h-1 rounded">
                     <div class="flex justify-between mb-2 font-bold">
                         <span>Total Price</span>
-                        <span>{{ Number::currency($total_price + $shipping_cost, 'Rp.') }}</span>
+                        <span>{{ Number::currency($total_price, 'Rp.') }}</span>
                     </div>
                 </div>
                 <button type="submit" class="bg-green-500 mt-4 w-full p-3 rounded-lg text-lg text-white hover:bg-green-600" id="pay-button">
