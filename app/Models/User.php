@@ -49,19 +49,6 @@ class User extends Authenticatable implements FilamentUser
         'password' => 'hashed',
     ];
 
-    public static function roles(): array
-    {
-        return ['owner', 'admin_pemasaran', 'admin_penjualan', 'staff', 'pelanggan'];
-    }
-
-    public function setRoleAttribute($value)
-    {
-        if (!in_array($value, self::roles())) {
-            throw new \InvalidArgumentException("Invalid role: $value");
-        }
-        $this->attributes['role'] = $value;
-    }
-
     public function orders()
     {
         return $this->hasMany(Order::class);
