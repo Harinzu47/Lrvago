@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "barryvdh/laravel-dompdf": "^3.1",
         "bezhansalleh/filament-shield": "^3.3",
         "dipantry/rajaongkir": "^2.2",
         "filament/filament": "^3.2",
@@ -16,7 +17,8 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.5",
         "midtrans/midtrans-php": "^2.6",
-        "nekoding/rajaongkir": "^1.2"
+        "nekoding/rajaongkir": "^1.2",
+        "spatie/laravel-sitemap": "^7.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

@@ -2,29 +2,35 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers\AddressRelationManager;
+use Filament\Forms;
+use Filament\Tables;
 use App\Models\Order;
 use App\Models\Product;
-use Filament\Forms;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Number;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Columns\SelectColumn;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Number;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\OrderResource\Pages;
+use Filament\Tables\Actions\Action;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Response;
+use App\Filament\Resources\OrderResource\RelationManagers\AddressRelationManager;
 
 class OrderResource extends Resource
 {
@@ -65,7 +71,7 @@ class OrderResource extends Resource
                             ->default('pending')
                             ->required(),
 
-                        ToggleButtons::make('status')
+                            ToggleButtons::make('status')
                             ->inline()
                             ->default('new')
                             ->required()
@@ -89,8 +95,7 @@ class OrderResource extends Resource
                                 'shipped' => 'heroicon-m-truck',
                                 'delivered' => 'heroicon-m-check-badge',
                                 'canceled' => 'heroicon-m-x-circle',
-                            ]),
-
+                            ]),                    
                         Select::make('currency')
                             ->options([
                                 'idr' => 'IDR',
@@ -138,6 +143,7 @@ class OrderResource extends Resource
                                 TextInput::make('quantity')
                                     ->numeric()
                                     ->required()
+                                    ->disabled()
                                     ->default(1)
                                     ->minValue(1)
                                     ->columnSpan(2)
@@ -155,6 +161,7 @@ class OrderResource extends Resource
                                 TextInput::make('total_amount')
                                     ->numeric()
                                     ->required()
+                                    ->disabled()
                                     ->dehydrated()
                                     ->columnSpan(3),
                             ])->columns(12),
@@ -232,14 +239,101 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Define your filters here
+                SelectFilter::make('created_at')
+                    ->label('Filter by Date')
+                    ->options([
+                        'day' => 'Per Hari',
+                        'month' => 'Per Bulan',
+                        'year' => 'Per Tahun',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if ($data['value'] === 'day') {
+                            $query->whereDate('created_at', now()->toDateString());
+                        } elseif ($data['value'] === 'month') {
+                            $query->whereMonth('created_at', now()->month);
+                        } elseif ($data['value'] === 'year') {
+                            $query->whereYear('created_at', now()->year);
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ])
+                    Tables\Actions\EditAction::make()
+                        ->visible(fn ($record) => !in_array($record->status, ['shipped', 'delivered'])),
+            
+                    Tables\Actions\DeleteAction::make()
+                         ->visible(fn ($record) => !in_array($record->status, ['shipped', 'delivered'])),
+                    Action::make('generateReport')
+                    ->label('Generate Report')
+                    ->icon('heroicon-o-document-text')
+                    ->form([
+                        Select::make('periode')
+                            ->label('Pilih Periode')
+                            ->options([
+                                'month' => 'Per Bulan',
+                                'year' => 'Per Tahun',
+                            ])
+                            ->required()
+                            ->reactive(),
+                
+                        Select::make('bulan')
+                            ->label('Bulan')
+                            ->options([
+                                '1' => 'Januari',
+                                '2' => 'Februari',
+                                '3' => 'Maret',
+                                '4' => 'April',
+                                '5' => 'Mei',
+                                '6' => 'Juni',
+                                '7' => 'Juli',
+                                '8' => 'Agustus',
+                                '9' => 'September',
+                                '10' => 'Oktober',
+                                '11' => 'November',
+                                '12' => 'Desember',
+                            ])
+                            ->hidden(fn (Get $get) => $get('periode') !== 'month')
+                            ->required(fn (Get $get) => $get('periode') === 'month'),
+                
+                        Select::make('tahun')
+                            ->label('Tahun')
+                            ->options([
+                                now()->year => now()->year,
+                                now()->year - 1 => now()->year - 1,
+                                now()->year - 2 => now()->year - 2,
+                                now()->year - 3 => now()->year - 3,
+                            ])
+                            ->default(now()->year)
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        // Ambil data dari form
+                        $periode = $data['periode'];
+                        $tahun = $data['tahun'];
+                        $bulan = $data['bulan'] ?? null;
+                
+                        // Query pesanan sesuai periode yang dipilih
+                        $query = Order::query();
+                
+                        if ($periode === 'month' && $bulan) {
+                            $query->whereYear('created_at', $tahun)->whereMonth('created_at', $bulan);
+                        } elseif ($periode === 'year') {
+                            $query->whereYear('created_at', $tahun);
+                        }
+                
+                        $orders = $query->get();
+                
+                        // Load view PDF
+                        $pdf = Pdf::loadView('reports.orders', compact('orders', 'periode', 'tahun', 'bulan'));
+                
+                        return Response::streamDownload(function () use ($pdf) {
+                            echo $pdf->stream();
+                        }, "laporan-pesanan-{$periode}-{$tahun}.pdf");
+                    }),
+                
+                
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

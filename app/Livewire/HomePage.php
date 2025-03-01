@@ -7,7 +7,7 @@ use App\Models\Product;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 
-#[Title('Home Page - LarvaGo')]
+#[Title('Jual Maggot Online - Larva Go | Solusi Pengelolaan Limbah Organik')]
 
 class HomePage extends Component
 {

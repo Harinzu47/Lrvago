@@ -37,10 +37,13 @@ class PaymentResource extends Resource
                     ->label('Order ID')
                     ->required()
                     ->numeric(),
+
                 TextInput::make('amount')
                     ->label('Amount')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->disabled(fn ($record) => $record !== null), // Mengunci saat edit
+
                 Select::make('method')
                     ->label('Payment Method')
                     ->options([
@@ -48,6 +51,7 @@ class PaymentResource extends Resource
                         'midtrans' => 'Midtrans',
                     ])
                     ->required(),
+
                 Select::make('status')
                     ->label('Payment Status')
                     ->options([
@@ -56,6 +60,7 @@ class PaymentResource extends Resource
                         'failed' => 'Failed',
                     ])
                     ->required(),
+
                 DateTimePicker::make('payment_date')
                     ->label('Payment Date'),
             ]);
@@ -104,8 +109,11 @@ class PaymentResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($record) => $record->status !== 'completed'),
+                
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn ($record) => $record->status !== 'completed'), 
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

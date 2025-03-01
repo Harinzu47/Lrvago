@@ -13,8 +13,8 @@ class OrderStats extends BaseWidget
         return [
             Stat::make('New Orders', Order::query()->where('status', 'new')->count()),
             Stat::make('Order Processing', Order::query()->where('status', 'processing')->count()),
-            Stat::make('Order Shipped', Order::query()->where('status', 'shipped')->count()),
-            Stat::make('Average Order Value', Order::query()->avg('total_price'))
+            Stat::make('Order Delivered', Order::query()->where('status', 'delivered')->count()),
+            Stat::make('Average Order Value', 'Rp ' . number_format(Order::query()->avg('total_price'), 0, ',', '.'))
         ];
     }
 }

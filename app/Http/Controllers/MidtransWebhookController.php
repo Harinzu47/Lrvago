@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\Order;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PaymentSuccessMail;
 
 class MidtransWebhookController extends Controller
 {
@@ -38,6 +40,11 @@ class MidtransWebhookController extends Controller
             $order->payment_status = 'paid';
             $order->status = 'processing';
             $order->save();
+            // Setelah pembayaran sukses, kirim email
+            Mail::to($order->customer->email)->send(new PaymentSuccessMail($order));
+
+            // Kirim email ke admin_penjualan
+            Mail::to('admin_penjualan@gmail.com')->send(new PaymentSuccessMail($order));
         } elseif (in_array($transactionStatus, ['pending', 'deny', 'expire', 'cancel'])) {
             $payment->status = $transactionStatus;
         }

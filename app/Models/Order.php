@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 class Order extends Model
 {
@@ -20,6 +21,19 @@ class Order extends Model
         'shipping_method',
         'notes'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($order) {
+            if (in_array($order->getOriginal('status'), ['shipped', 'delivered'])) {
+                throw ValidationException::withMessages([
+                    'status' => 'Status tidak dapat diubah setelah dikirim atau diterima.'
+                ]);
+            }
+        });
+    }
 
     public function user()
     {
@@ -39,5 +53,10 @@ class Order extends Model
     public function payment()
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function laporan()
+    {
+        return $this->hasOne(Laporan::class);
     }
 }

@@ -6,41 +6,58 @@ use Illuminate\Support\Facades\Http;
 
 class RajaOngkirService
 {
+    protected $baseUrl;
     protected $apiKey;
 
     public function __construct()
     {
-        $this->apiKey = env('RAJAONGKIR_API_KEY');
+        $this->baseUrl = config('services.rajaongkir.endpoint');
+        $this->apiKey = config('services.rajaongkir.key');
     }
 
     public function getProvinces()
     {
-        $response = Http::withHeaders(['key' => $this->apiKey])
-            ->get('https://api.rajaongkir.com/starter/province');
-
-        return $response->json()['rajaongkir']['results'] ?? [];
+        $response = Http::withHeaders([
+            'key' => $this->apiKey,
+        ])->get($this->baseUrl . '/province');
+    
+        if ($response->successful()) {
+            return $response->json()['rajaongkir']['results'];
+        }
+    
+        return [];
+    }
+    
+    public function getCities($province_id)
+    {
+        $response = Http::withHeaders([
+            'key' => $this->apiKey,
+        ])->get($this->baseUrl . '/city', [
+            'province' => $province_id,
+        ]);
+    
+        if ($response->successful()) {
+            return $response->json()['rajaongkir']['results'];
+        }
+    
+        return [];
     }
 
-    public function getCities($provinceId)
+    public function getShippingCost($origin, $destination, $weight, $courier)
     {
-        $response = Http::withHeaders(['key' => $this->apiKey])
-            ->get('https://api.rajaongkir.com/starter/city', [
-                'province' => $provinceId
-            ]);
+        $response = Http::withHeaders([
+            'key' => $this->apiKey,
+        ])->post($this->baseUrl . '/cost', [
+            'origin' => $origin,
+            'destination' => $destination,
+            'weight' => $weight,
+            'courier' => $courier,
+        ]);
 
-        return $response->json()['rajaongkir']['results'] ?? [];
-    }
+        if ($response->successful()) {
+            return $response->json()['rajaongkir']['results'];
+        }
 
-    public function calculateShippingCost($origin, $destination, $weight, $courier)
-    {
-        $response = Http::withHeaders(['key' => $this->apiKey])
-            ->post('https://api.rajaongkir.com/starter/cost', [
-                'origin' => $origin,
-                'destination' => $destination,
-                'weight' => $weight,
-                'courier' => $courier,
-            ]);
-
-        return $response->json();
+        return null;
     }
 }

@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use Filament\Panel;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -11,10 +9,12 @@ use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, AuthorizableContract
 {
-    use HasApiTokens, HasFactory, Notifiable,HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, Authorizable;
 
     /**
      * The attributes that are mass assignable.
@@ -49,38 +49,41 @@ class User extends Authenticatable implements FilamentUser
         'password' => 'hashed',
     ];
 
+    /**
+     * Relasi ke Order
+     */
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
-    public function user()
-    {
-    return $this->belongsTo(User::class);
-    }
-
+    /**
+     * Menentukan akses ke Filament Panel
+     */
     public function canAccessPanel(Panel $panel): bool
     {
-    // Daftar email yang diizinkan
-    $allowedEmails = [
-        'owner@gmail.com',
-        'admin_pemasaran@gmail.com',
-        'admin_penjualan@gmail.com',
-        'staff@gmail.com'
-    ];
-
-    // Periksa apakah email pengguna ada dalam daftar yang diizinkan
-    return in_array($this->email, $allowedEmails);
+        return in_array($this->role, [
+            'owner',
+            'admin_pemasaran',
+            'admin_penjualan',
+            'staff'
+        ]);
     }
 
+    /**
+     * Periksa apakah pengguna memiliki peran tertentu
+     */
     public function hasRole($roles): bool
     {
         if (is_array($roles)) {
             return in_array($this->role, $roles);
         }
         return $this->role === $roles;
-    }   
+    }
 
+    /**
+     * Scope query berdasarkan peran
+     */
     public function scopeByRole($query, $roles)
     {
         if (is_array($roles)) {
